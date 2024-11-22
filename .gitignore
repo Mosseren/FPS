@@ -1,0 +1,17 @@
+.vs/
+Binaries/
+Build/
+Intermediate/
+Saved/
+DerivedDataCache/
+
+
+*.sln
+*.vcxproj*
+*.vsconfig
+
+
+*.log
+*.tmp
+*.db
+Thumbs.db
