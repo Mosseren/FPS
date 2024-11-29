@@ -11,9 +11,31 @@ class ATct_FPSGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
-public:
-	ATct_FPSGameMode();
-};
+protected:
+	bool bTimeOver = false;
+	int32 iImportantCnt;
+	int32 iRoundTime;
 
+public:
+	int32 iScore = 0;
+
+protected:
+	ATct_FPSGameMode();
+
+	FTimerHandle TimerHandle;
+
+	void SetTimer();
+
+	virtual void BeginPlay() override;
+
+	void Tick(float DeltaTime);
+
+	void OnTimerComplete();
+
+	void SelectImportantBoxes();
+
+public:
+	void AddScore(int32 Value);
+};
 
 

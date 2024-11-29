@@ -12,6 +12,7 @@
 #include "Animation/AnimInstance.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
+#include "Engine/Engine.h"
 
 // Sets default values for this component's properties
 UTct_FPSWeaponComponent::UTct_FPSWeaponComponent()
@@ -23,6 +24,7 @@ UTct_FPSWeaponComponent::UTct_FPSWeaponComponent()
 
 void UTct_FPSWeaponComponent::Fire()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("Fire"));
 	if (Character == nullptr || Character->GetController() == nullptr)
 	{
 		return;
