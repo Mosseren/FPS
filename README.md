@@ -10,3 +10,7 @@
 ![效果](./imgs/2_效果.png)
 ## 从配置读取变量值
 ![读DefaultGame.ini](./imgs/2_从配置加载.png)
+
+# 第三节课作业:
+## 完成第二节附加题UI：增加了开启射击挑战的3D Widget、显示积分倒计时的HUD
+![UI](./imgs/3_UI.png)

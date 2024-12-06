@@ -18,10 +18,8 @@ ABoxActor::ABoxActor()
 	// Create collision component
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
 	BoxCollision->SetBoxExtent(FVector(50.0f, 50.0f, 50.0f));
-	BoxCollision->SetNotifyRigidBodyCollision(true);
 	BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	BoxCollision->SetCollisionResponseToAllChannels(ECR_Block);
-	BoxCollision->OnComponentHit.AddDynamic(this, &ABoxActor::OnHitFunc);
 	RootComponent = BoxCollision;
 
 	// Create mesh component and set it as root
@@ -67,28 +65,34 @@ int32 ABoxActor::GetValue()
 }
 
 
-void ABoxActor::OnHitFunc(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void ABoxActor::OnHitFunc()
 {
-	if (OtherActor && OtherActor->ActorHasTag(FName("Bullet")))
-	{
-		if (!bHitOnce)
-		{
-			MakeBigger();
-			bHitOnce = true;
-		}
-		else
-		{
-			Destroy();
-		}
-		// 得分
-		if (GameMode == nullptr) {
-			GameMode = Cast<ATct_FPSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-		}
-		if (GameMode == nullptr) {
-			UE_LOG(LogTemp, Error, TEXT("current gamemode is not ATct_FPSGameMode!!!"));
-		}
-		GameMode->AddScore(GetValue());
+	if (GameMode == nullptr) {
+		GameMode = Cast<ATct_FPSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	}
+	if (GameMode == nullptr) {
+		UE_LOG(LogTemp, Error, TEXT("current gamemode is not ATct_FPSGameMode!!!"));
+		return;
+	}
+	if(GameMode->CountDownStatus != ECountDownStatus::Processing)
+	{
+		return;
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("hitOnce?=%s"), bHitOnce ? TEXT("true") : TEXT("false")));
+	if (!bHitOnce)
+	{
+		bHitOnce = true;
+		MakeBigger();
+	}
+	else
+	{
+		Destroy();
+	}
+
+	// 得分
+	GameMode->AddScore(GetValue());
+	
 }
 
 // Enable physics simulation on the box

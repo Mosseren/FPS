@@ -41,8 +41,7 @@ public:
 
 	int32 GetValue();
 
-	UFUNCTION()
-	void OnHitFunc(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void OnHitFunc();
 
 	void EnablePhysicsSimulation();
 };

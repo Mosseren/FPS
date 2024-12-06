@@ -4,6 +4,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "Engine/Engine.h"
+#include "BoxActor.h"
 
 ATct_FPSProjectile::ATct_FPSProjectile() 
 {
@@ -41,6 +42,12 @@ void ATct_FPSProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherActor->ActorHasTag(FName("Box")))
 	{
 		//OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
-		Destroy();
+		ABoxActor* BoxActor = Cast<ABoxActor>(OtherActor);
+
+		if (BoxActor)
+		{
+			BoxActor->OnHitFunc();
+			Destroy();
+		}
 	}
 }
