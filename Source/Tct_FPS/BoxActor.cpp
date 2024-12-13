@@ -7,6 +7,7 @@
 #include "Engine/Engine.h"
 #include "Tct_FPSGameMode.h"
 #include <Kismet/GameplayStatics.h>
+#include "MyPlayerController.h"
 
 
 // Sets default values
@@ -30,7 +31,7 @@ ABoxActor::ABoxActor()
 
 	Tags.Add(FName("Box"));
 
-	// ¶ÁÈ¡ÅäÖÃ
+	// è¯»å–é…ç½®
 	GConfig->GetInt(TEXT("/Script/TCT_FPS.ABoxActor"), TEXT("iValue"), iValue, GGameIni);
 	GConfig->GetFloat(TEXT("/Script/TCT_FPS.ABoxActor"), TEXT("iScaleFactor"), iScaleFactor, GGameIni);
 }
@@ -38,7 +39,6 @@ ABoxActor::ABoxActor()
 
 void ABoxActor::MakeBigger()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("bigger"));
 	FVector NewScale = BoxCollision->GetComponentScale() * iScaleFactor;
 	BoxCollision->SetWorldScale3D(NewScale);
 }
@@ -46,7 +46,7 @@ void ABoxActor::MakeBigger()
 void ABoxActor::MakeImportant()
 {
 	bIsImportant = true;
-	// »ñÈ¡mesh ´´½¨²ÄÖÊ ¸ÄÉ«
+	// è·å–mesh åˆ›å»ºæè´¨ æ”¹è‰²
 	UStaticMeshComponent* MeshComponent = FindComponentByClass<UStaticMeshComponent>();
 	if (MeshComponent)
 	{
@@ -65,7 +65,7 @@ int32 ABoxActor::GetValue()
 }
 
 
-void ABoxActor::OnHitFunc()
+void ABoxActor::OnHitFunc(APlayerController* CasterPlayer)
 {
 	if (GameMode == nullptr) {
 		GameMode = Cast<ATct_FPSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -90,20 +90,25 @@ void ABoxActor::OnHitFunc()
 		Destroy();
 	}
 
-	// µÃ·Ö
+	// å¾—åˆ†
 	GameMode->AddScore(GetValue());
-	
+	// å‘½ä¸­å‡†æ˜Ÿå¤„ç†
+	AMyPlayerController* MyPlayerController = Cast<AMyPlayerController>(CasterPlayer);
+	if (MyPlayerController)
+	{
+		MyPlayerController->OnHitAnimAimingPoint();
+	}
 }
 
 // Enable physics simulation on the box
 void ABoxActor::EnablePhysicsSimulation()
 {
-	// ÆôÓÃÎïÀíÄ£Äâ
+	// å¯ç”¨ç‰©ç†æ¨¡æ‹Ÿ
 	BoxCollision->SetSimulatePhysics(true);
-	// ÉèÖÃÎïÀíÄ£ÄâµÄÖÊÁ¿¡¢ÖØÁ¦
+	// è®¾ç½®ç‰©ç†æ¨¡æ‹Ÿçš„è´¨é‡ã€é‡åŠ›
 	BoxCollision->SetMassOverrideInKg(NAME_None, 50.f, true);
 	BoxCollision->SetEnableGravity(true);
-	// ÉèÖÃÄ¦²ÁÁ¦ºÍµ¯ĞÔ
+	// è®¾ç½®æ‘©æ“¦åŠ›å’Œå¼¹æ€§
 	BoxCollision->SetLinearDamping(0.5f);
 	BoxCollision->SetAngularDamping(0.5f);
 }

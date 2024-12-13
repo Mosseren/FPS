@@ -41,7 +41,7 @@ public:
 
 	int32 GetValue();
 
-	void OnHitFunc();
+	void OnHitFunc(APlayerController* PlayerController);
 
 	void EnablePhysicsSimulation();
 };

@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "Engine/Engine.h"
 #include "BoxActor.h"
+#include "GameFramework/PlayerController.h"
 
 ATct_FPSProjectile::ATct_FPSProjectile() 
 {
@@ -36,6 +37,11 @@ ATct_FPSProjectile::ATct_FPSProjectile()
 	Tags.Add(FName("Bullet"));
 }
 
+void ATct_FPSProjectile::SetCaster(APlayerController* Caster)
+{
+	this->CasterPlayer = Caster;
+}
+
 void ATct_FPSProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	// Only add impulse and destroy projectile if we hit a physics
@@ -46,7 +52,7 @@ void ATct_FPSProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 
 		if (BoxActor)
 		{
-			BoxActor->OnHitFunc();
+			BoxActor->OnHitFunc(CasterPlayer);
 			Destroy();
 		}
 	}

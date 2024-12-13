@@ -13,6 +13,7 @@
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"
+#include "MyPlayerController.h"
 
 // Sets default values for this component's properties
 UTct_FPSWeaponComponent::UTct_FPSWeaponComponent()
@@ -36,8 +37,8 @@ void UTct_FPSWeaponComponent::Fire()
 		UWorld* const World = GetWorld();
 		if (World != nullptr)
 		{
-			APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
-			const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
+			AMyPlayerController* MyPlayerController = Cast<AMyPlayerController>(Character->GetController());
+			const FRotator SpawnRotation = MyPlayerController->PlayerCameraManager->GetCameraRotation();
 			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
 			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
 	
@@ -46,14 +47,16 @@ void UTct_FPSWeaponComponent::Fire()
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 	
 			// Spawn the projectile at the muzzle
-			World->SpawnActor<ATct_FPSProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			ATct_FPSProjectile* Projectile = World->SpawnActor<ATct_FPSProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			Projectile->SetCaster(MyPlayerController);
+			MyPlayerController->ConsumeBullet();
 		}
 	}
 	
 	// Try and play the sound if specified
 	if (FireSound != nullptr)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation());
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation(), Character->GetActorRotation(), 0.5f);
 	}
 	
 	// Try and play a firing animation if specified

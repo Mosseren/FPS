@@ -21,8 +21,12 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* TimeText;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* BulletCount;
 	
 public:
 	void SetScore(const FString& Score);
 	void SetTime(const FString& Time);
+	void SetBulletCount(int32 Count);
 };

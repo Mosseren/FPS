@@ -8,6 +8,7 @@
 
 class USphereComponent;
 class UProjectileMovementComponent;
+class APlayerController;
 
 UCLASS(config=Game)
 class ATct_FPSProjectile : public AActor
@@ -22,8 +23,11 @@ class ATct_FPSProjectile : public AActor
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
 
+	APlayerController* CasterPlayer;
 public:
 	ATct_FPSProjectile();
+
+	void SetCaster(APlayerController* Caster);
 
 	/** called when projectile hits something */
 	UFUNCTION()

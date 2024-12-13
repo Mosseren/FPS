@@ -19,3 +19,11 @@ void UHUDWidget::SetTime(const FString& Time)
 		TimeText->SetText(FText::FromString(Time));
 	}
 }
+
+void UHUDWidget::SetBulletCount(int32 Count)
+{
+	if (BulletCount)
+	{
+		BulletCount->SetText(FText::FromString(FString::FromInt(Count)));
+	}
+}

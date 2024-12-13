@@ -8,13 +8,14 @@
 
 #include "MyPlayerController.h"
 #include <Kismet/GameplayStatics.h>
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 
 
 // Sets default values
 AShootingConsole::AShootingConsole()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	//PrimaryActorTick.bCanEverTick = true;
 
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
 	BoxCollision->SetBoxExtent(FVector(50.0f, 50.0f, 50.0f));
@@ -40,38 +41,58 @@ AShootingConsole::AShootingConsole()
 void AShootingConsole::BeginPlay()
 {
 	Super::BeginPlay();
-	if (PlayerController == nullptr)
-	{
-		PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
-	}
 	GameMode = Cast<ATct_FPSGameMode>(UGameplayStatics::GetGameMode(this));
 	HideStartBtn();
 }
 
-// Called every frame
-void AShootingConsole::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if (PlayerController->IsInputKeyDown(EKeys::E) && GameMode && GameMode->CountDownStatus != ECountDownStatus::Processing)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("E pressed"));
-		HideStartBtn(); // Òþ²Ø UI
-		GameMode->CoundDown(); // ¿ªÊ¼µ¹¼ÆÊ±
-	}
-}
-
 void AShootingConsole::OnTriggerAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (!OtherActor->ActorHasTag(TEXT("Player")))
+	{
+		return;
+	}
 	if (GameMode && GameMode->CountDownStatus != ECountDownStatus::Processing)
 	{
 		ShowStartBtn();
+	}
+	// ç»‘å®šæŒ‰é”®
+	if (GameMode)
+	{
+		if (StartBtnMapping)
+		{
+			GameMode->EnhancedInputSubsystem->AddMappingContext(StartBtnMapping, 1);
+		}
+		if (!IMC_binded && GameMode && GameMode->EnhancedInputComponent && StartBtnAction)
+		{
+			GameMode->EnhancedInputComponent->BindAction(StartBtnAction, ETriggerEvent::Triggered, this, &AShootingConsole::StartShooting);
+			IMC_binded = true;
+		}
 	}
 }
 
 void AShootingConsole::OnTriggerAreaEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	if (!OtherActor->ActorHasTag(TEXT("Player")))
+	{
+		return;
+	}
 	HideStartBtn();
+	 // å–æ¶ˆç»‘å®š
+	/*if (GameMode && GameMode->EnhancedInputComponent && StartBtnAction)
+	{
+		GameMode->EnhancedInputComponent->RemoveActionBinding(TEXT("StartBtnAction"), EInputEvent::IE_Pressed);
+	}*/
+	if (GameMode && GameMode->EnhancedInputSubsystem && StartBtnMapping)
+	{
+		GameMode->EnhancedInputSubsystem->RemoveMappingContext(StartBtnMapping);
+	}
+}
+
+void AShootingConsole::StartShooting()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("E pressed"));
+	HideStartBtn(); // éšè— UI
+	GameMode->CoundDown(); // å¼€å§‹å€’è®¡æ—¶
 }
 
 void AShootingConsole::ShowStartBtn()

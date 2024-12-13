@@ -11,6 +11,8 @@ class UBoxComponent;
 class UWidgetComponent;
 class ATct_FPSGameMode;
 class AMyPlayerController;
+class UInputAction;
+class UInputMappingContext;
 
 UCLASS()
 class TCT_FPS_API AShootingConsole : public AActor
@@ -22,28 +24,32 @@ public:
 	AShootingConsole();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	AMyPlayerController* PlayerController;
+	bool IMC_binded = false;
 
+	virtual void BeginPlay() override;
 
 	TObjectPtr<ATct_FPSGameMode> GameMode;
 
-	UPROPERTY(EditAnywhere, Category = "碰撞 | 柱子")
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> BoxCollision;
 
-	UPROPERTY(EditAnywhere, Category = "碰撞 | 触发区域")
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> TriggerArea;
 
-	UPROPERTY(EditAnywhere, Category = "模型")
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMeshComponent> ConsoleMesh;
 
-	UPROPERTY(EditAnywhere, Category = "UI")
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UWidgetComponent> WidgetComponent;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* StartBtnAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputMappingContext* StartBtnMapping;
+
+	void StartShooting();
+
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 	void OnTriggerAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -56,6 +62,5 @@ public:
 	void ShowStartBtn();
 
 	void HideStartBtn();
-	
 	
 };

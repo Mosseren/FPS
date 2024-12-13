@@ -7,6 +7,8 @@
 #include "Tct_FPSGameMode.generated.h"
 
 class AMyPlayerController;
+class UEnhancedInputLocalPlayerSubsystem;
+class UEnhancedInputComponent;
 
 enum class ECountDownStatus
 {
@@ -30,10 +32,11 @@ public:
 
 	ECountDownStatus CountDownStatus;
 
+	UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem;
+	UEnhancedInputComponent* EnhancedInputComponent;
+
 protected:
 	ATct_FPSGameMode();
-
-	AMyPlayerController* PlayerController;
 
 	FTimerHandle UpdateHandle;
 
@@ -46,6 +49,8 @@ protected:
 	void SelectImportantBoxes();
 
 public:
+	AMyPlayerController* PlayerController;
+
 	void AddScore(int32 Value);
 
 	void CoundDown();

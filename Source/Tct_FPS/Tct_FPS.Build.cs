@@ -9,5 +9,12 @@ public class Tct_FPS : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
-	}
+
+
+        PublicIncludePaths.AddRange(
+            new string[] {
+                "Tct_FPS",
+            }
+        );
+    }
 }

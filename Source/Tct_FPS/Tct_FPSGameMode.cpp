@@ -6,6 +6,8 @@
 #include "BoxActor.h"
 #include <Kismet/GameplayStatics.h>
 #include "MyPlayerController.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 
 ATct_FPSGameMode::ATct_FPSGameMode()
 	: Super()
@@ -19,24 +21,27 @@ ATct_FPSGameMode::ATct_FPSGameMode()
 
 	PrimaryActorTick.bCanEverTick = true;
 
-	// ¶ÁÈ¡ÅäÖÃ
+	// è¯»å–é…ç½®
 	GConfig->GetInt(TEXT("/Script/TCT_FPS.ATct_FPSGameMode"), TEXT("iImportantCnt"), iImportantCnt, GGameIni);
 	GConfig->GetInt(TEXT("/Script/TCT_FPS.ATct_FPSGameMode"), TEXT("iRoundTime"), iRoundTime, GGameIni);
 
+	CountDownStatus = ECountDownStatus::Unstarted;
 }
 
 void ATct_FPSGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
 	if (PlayerController == nullptr)
 	{
 		PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
+		PlayerController->bShowMouseCursor = false;
 	}
+	EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+
+	EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent);
+
 	SelectImportantBoxes();
 	PlayerController->InitializeHUD();
-
-	CountDownStatus = ECountDownStatus::Unstarted;
 }
 
 void ATct_FPSGameMode::Tick(float DeltaTime)
@@ -45,6 +50,7 @@ void ATct_FPSGameMode::Tick(float DeltaTime)
 
 void ATct_FPSGameMode::CoundDown()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Count down"));
 	TimeRemaining = iRoundTime;
 	CountDownStatus = ECountDownStatus::Processing;
 	GetWorld()->GetTimerManager().SetTimer(UpdateHandle, this, &ATct_FPSGameMode::UpdateHUDTime, 1.f, true, 1.f);
@@ -79,20 +85,20 @@ void ATct_FPSGameMode::SelectImportantBoxes()
 
 	TSet<int32> ChosenIndices;
 
-	// Ëæ»úÑ¡Ôñ m ¸ö²»Í¬µÄ·½¿é
+	// éšæœºé€‰æ‹© m ä¸ªä¸åŒçš„æ–¹å—
 	while (ChosenIndices.Num() < iImportantCnt)
 	{
-		// Ëæ»úÉú³ÉÒ»¸öÏÂ±ê
+		// éšæœºç”Ÿæˆä¸€ä¸ªä¸‹æ ‡
 		int32 RandomIndex = FMath::RandRange(0, AllBoxes.Num() - 1);
 
 		while (ChosenIndices.Contains(RandomIndex))
 		{
-			RandomIndex = (RandomIndex + 1) % AllBoxes.Num();  // Ñ­»·µİÔö£¬Ö±µ½²»ÖØ¸´
+			RandomIndex = (RandomIndex + 1) % AllBoxes.Num();  // å¾ªç¯é€’å¢ï¼Œç›´åˆ°ä¸é‡å¤
 		}
 
 		ChosenIndices.Add(RandomIndex);
 
-		// Ñ¡ÖĞ·½¿éÉèÎªÖØÒª
+		// é€‰ä¸­æ–¹å—è®¾ä¸ºé‡è¦
 		ABoxActor* SelectedBlock = Cast<ABoxActor>(AllBoxes[RandomIndex]);
 		if (SelectedBlock)
 		{
